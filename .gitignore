@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Variables de entorno
+.env
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Datasets subidos o generados
+backend/storage/datasets/
+backend/storage/results/
+datasets/
+
+# Archivos pesados de datos
+*.csv
+*.xlsx
+*.parquet
+*.pkl
+*.pdf
+# Node / Angular
+node_modules/
+dist/
+.angular/
