@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "diseño-metricas.md",
+                "file": "vision-general.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "diseño-metricas"
+              "title": "vision-general"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "diseño-metricas.md",
+                "file": "vision-general.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Enlaces entrantes de diseño-metricas"
+              "title": "Enlaces entrantes de vision-general"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "diseño-metricas.md",
+                "file": "vision-general.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Enlaces salientes de diseño-metricas"
+              "title": "Enlaces salientes de vision-general"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "diseño-metricas.md",
+                "file": "vision-general.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Esquema de diseño-metricas"
+              "title": "Esquema de vision-general"
             }
           }
         ]
@@ -185,10 +185,10 @@
   },
   "active": "18fbf3deb352873d",
   "lastOpenFiles": [
-    "rules.md",
-    "vision-general.md",
-    "diseño-metricas.md",
     "api_spec_v1.md",
+    "diseño-metricas.md",
+    "vision-general.md",
+    "rules.md",
     "Sin nombre"
   ]
 }

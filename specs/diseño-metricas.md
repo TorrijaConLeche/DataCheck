@@ -86,9 +86,11 @@ interpretation
 
 - `raw_value`: valor real calculado.
     
-- `normalized_value`: valor normalizado, preferiblemente entre 0 y 1.
+- `normalized_value`: puntuación normalizada entre 0 y 1, donde `1` representa el mejor resultado posible y `0` el peor resultado.
     
 - `interpretation`: explicación textual breve del resultado.
+
+El valor directo de la fórmula, especialmente en métricas ISO, deberá conservarse en `raw_value`. Si la fórmula original mide error, riesgo, divergencia o porcentaje negativo para la calidad, `normalized_value` deberá transformarse para mantener siempre la regla `1 = mejor` y `0 = peor`.
     
 
 ---

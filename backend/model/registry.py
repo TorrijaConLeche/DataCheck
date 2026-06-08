@@ -4,7 +4,7 @@ from collections.abc import Iterable
 
 from .base_metric import BaseMetric
 from .metrics.basic import NullPercentageMetric
-from .metrics.iso.balance import BalML8Metric
+from .metrics.iso.balance import BalML3Metric, BalML8Metric
 from .metrics.iso.diversity import DivML1Metric, DivML2Metric, DivML3Metric
 
 
@@ -16,6 +16,7 @@ class MetricRegistry:
             "Div-ML-1": DivML1Metric(),
             "Div-ML-2": DivML2Metric(),
             "Div-ML-3": DivML3Metric(),
+            "Bal-ML-3": BalML3Metric(),
             "Bal-ML-8": BalML8Metric(),
 
         }
