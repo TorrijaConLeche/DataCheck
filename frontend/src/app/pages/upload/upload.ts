@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-upload',
-  template: `<p>En construcción</p>`
+  templateUrl: './upload.html',
+  styleUrl: './upload.css'
 })
 export class UploadPage {}

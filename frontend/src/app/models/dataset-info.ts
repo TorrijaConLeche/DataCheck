@@ -1,6 +1,12 @@
+export interface ColumnInfo {
+  name: string;
+  dtype: string;
+}
+
 export interface DatasetInfo {
-  nombre_archivo: string;
-  filas: number;
-  columnas: number;
-  columnas_nombres: string[];
+  dataset_id: string;
+  filename: string;
+  rows: number;
+  columns: number;
+  columns_info: ColumnInfo[];
 }

@@ -120,14 +120,15 @@ No incluye:
 
 
 ## 8. Diseño Frontend / UX-UI 
-No habrá tests en el frontend, todos los -spec se eliminaran
-Todo menos la fuente se define como una variable CSS:
-- Fuente Montserrat en todo el proyecto
-- Tamaños letra: 32px, 24px, 18px, 14px
-- Espaciados: 8px, 16px, 24px
-- Colores:
---ocean-blue: #0284c7ff; (color acento)
---bright-snow: #f8fafcff;  (fondo principal)
---white: #ffffffff;  (tarjetas / secciones)
---prussian-blue: #0f172aff;  (texto principal)
---slate-grey: #64748bff; (texto secundario / bordes)
+1. No habrá tests en el frontend, todos los -spec se eliminaran
+2. Por cada componente habra: .ts, .css, .html
+3. Todo menos la fuente se define como una variable CSS:
+	- Fuente Montserrat en todo el proyecto
+	- Tamaños letra: 32px, 24px, 18px, 14px
+	- Espaciados: 8px, 16px, 24px
+	- Colores:
+	--ocean-blue: #0284c7ff; (color acento)
+	--bright-snow: #f8fafcff;  (fondo principal)
+	--white: #ffffffff;  (tarjetas / secciones)
+	--prussian-blue: #0f172aff;  (texto principal)
+	--slate-grey: #64748bff; (texto secundario)

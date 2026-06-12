@@ -1,41 +1,223 @@
-<div class="contenedor">
+<div class="container">
 
-  <h1>Evaluación de datasets CSV</h1>
+  <header class="page-header">
+    <h1>Data Check</h1>
+    <p class="muted">Sube un dataset, selecciona la columna objetivo y define las restricciones de calidad.</p>
+  </header>
 
-  <input
-    type="file"
-    accept=".csv"
-    (change)="onFileSelected($event)"
-  />
+  <!-- 1. Subir dataset -->
+  <section class="card stack">
+    <h2 class="section-title">1. Subir dataset</h2>
 
-  @if (resultado) {
+    <label class="field-label" for="archivo">
+      Archivo CSV
+      <input
+        id="archivo"
+        class="input"
+        type="file"
+        accept=".csv"
+        (change)="onFileSelected($event)"
+      />
+    </label>
 
-    <div class="resultado">
+    @if (errorSubida(); as msg) {
+      <div class="feedback-error">{{ msg }}</div>
+    }
+  </section>
 
-      <h2>Resultado del análisis</h2>
+  @if (datasetInfo(); as info) {
 
-      <!-- Información del dataset -->
-      <section class="bloque">
-        <h3>Información del dataset</h3>
+    <!-- 2. Información del dataset -->
+    <section class="card stack">
+      <h2 class="section-title">2. Información del dataset</h2>
 
-        <p><strong>Filas:</strong> {{ resultado.filas }}</p>
-        <p><strong>Columnas:</strong> {{ resultado.columnas }}</p>
-      </section>
+      <div class="info-grid">
+        <div class="info-cell">
+          <span class="muted">ID</span>
+          <span class="tag">{{ info.dataset_id }}</span>
+        </div>
+        <div class="info-cell">
+          <span class="muted">Archivo</span>
+          <span>{{ info.filename }}</span>
+        </div>
+        <div class="info-cell">
+          <span class="muted">Filas</span>
+          <span class="info-value">{{ info.rows }}</span>
+        </div>
+        <div class="info-cell">
+          <span class="muted">Columnas</span>
+          <span class="info-value">{{ info.columns }}</span>
+        </div>
+      </div>
 
-      <!-- Columnas -->
-      <section class="bloque">
-        <h3>Columnas</h3>
+      <h3>Columnas detectadas</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (col of info.columns_info; track col.name) {
+            <tr>
+              <td>{{ col.name }}</td>
+              <td><span class="tag">{{ col.dtype }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
 
-        @for (col of resultado.columnas_nombres; track col) {
-          <div class="columna">
-            {{ col }}
-          </div>
-        }
+    <!-- 3. Configurar análisis -->
+    <section class="card stack">
+      <h2 class="section-title">3. Configurar análisis</h2>
 
-      </section>
+      <label class="field-label" for="target">
+        Columna objetivo (target)
+        <select
+          id="target"
+          class="select"
+          [value]="targetColumn()"
+          (change)="onTargetChange($any($event.target).value)"
+        >
+          <option value="" disabled>Selecciona una columna</option>
+          @for (col of info.columns_info; track col.name) {
+            <option [value]="col.name">{{ col.name }} ({{ col.dtype }})</option>
+          }
+        </select>
+      </label>
 
-    </div>
+      <div class="divider"></div>
 
+      <h3>Restricciones por feature</h3>
+      <p class="muted">Define restricciones de calidad para las columnas predictoras.</p>
+
+      <div class="constraint-add">
+        <label class="field-label" for="add-col">
+          Añadir restricción a
+          <select
+            id="add-col"
+            class="select"
+            [value]="columnaParaRestriccion()"
+            (change)="onColumnaRestriccionChange($any($event.target).value)"
+            [disabled]="columnasRestriccion().length === 0"
+          >
+            <option value="" disabled>Selecciona una columna</option>
+            @for (col of columnasRestriccion(); track col.name) {
+              @if (!restricciones().has(col.name)) {
+                <option [value]="col.name">{{ col.name }} ({{ col.dtype }})</option>
+              }
+            }
+          </select>
+        </label>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="agregarRestriccion()"
+          [disabled]="!columnaParaRestriccion()"
+        >
+          Añadir
+        </button>
+      </div>
+
+      @if (columnasConRestriccion().length > 0) {
+        <div class="constraints-list">
+          @for (col of columnasConRestriccion(); track col) {
+            <div class="constraint-card">
+              <div class="constraint-header">
+                <strong>{{ col }}</strong>
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  (click)="quitarRestriccion(col)"
+                >
+                  Quitar
+                </button>
+              </div>
+
+              @if (restricciones().get(col); as ed) {
+                <div class="constraint-grid">
+                  <label class="field-label">
+                    Mínimo
+                    <input
+                      class="input"
+                      type="number"
+                      step="any"
+                      [value]="ed.minTexto"
+                      (input)="actualizarRestriccion(col, { minTexto: $any($event.target).value })"
+                    />
+                  </label>
+                  <label class="field-label">
+                    Máximo
+                    <input
+                      class="input"
+                      type="number"
+                      step="any"
+                      [value]="ed.maxTexto"
+                      (input)="actualizarRestriccion(col, { maxTexto: $any($event.target).value })"
+                    />
+                  </label>
+                  <label class="field-label constraint-wide">
+                    Valores permitidos (separados por coma)
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="Ej: male, female"
+                      [value]="ed.allowedValuesTexto"
+                      (input)="actualizarRestriccion(col, { allowedValuesTexto: $any($event.target).value })"
+                    />
+                  </label>
+                  <label class="field-label">
+                    Regex
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="Ej: ^[A-Z]{3}$"
+                      [value]="ed.regex"
+                      (input)="actualizarRestriccion(col, { regex: $any($event.target).value })"
+                    />
+                  </label>
+                  <label class="checkbox-row">
+                    <input
+                      type="checkbox"
+                      [checked]="ed.notNull"
+                      (change)="actualizarRestriccion(col, { notNull: $any($event.target).checked })"
+                    />
+                    No nulo
+                  </label>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="guardarConfiguracion()"
+          [disabled]="enviando() || !targetColumn()"
+        >
+          @if (enviando()) { Guardando... } @else { Guardar configuración }
+        </button>
+      </div>
+
+      @if (feedbackExito(); as msg) {
+        <div class="feedback-success">{{ msg }}</div>
+      }
+      @if (feedbackError(); as errs) {
+        <div class="feedback-error">
+          <strong>No se pudo guardar:</strong>
+          <ul>
+            @for (e of errs; track e) {
+              <li>{{ e }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </section>
   }
 
 </div>

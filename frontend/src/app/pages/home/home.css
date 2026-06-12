@@ -1,0 +1,80 @@
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-16);
+}
+
+.info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-16);
+  background-color: var(--bright-snow);
+  border-radius: 4px;
+}
+
+.info-value {
+  font-size: var(--font-size-24);
+  font-weight: 600;
+  color: var(--prussian-blue);
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--slate-grey);
+  opacity: 0.3;
+  margin: var(--space-8) 0;
+}
+
+.constraint-add {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-16);
+}
+
+.constraint-add .field-label {
+  flex: 1;
+}
+
+.constraints-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.constraint-card {
+  border: 1px solid var(--slate-grey);
+  border-radius: 4px;
+  padding: var(--space-16);
+  background-color: var(--bright-snow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.constraint-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.constraint-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-16);
+}
+
+.constraint-wide {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

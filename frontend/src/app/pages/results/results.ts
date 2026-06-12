@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-results',
-  template: `<p>En construcción</p>`
+  templateUrl: './results.html',
+  styleUrl: './results.css'
 })
 export class ResultsPage {}
