@@ -18,10 +18,16 @@ router = APIRouter(prefix="/datasets", tags=["datasets"])
 
 
 _DTYPES_NUMERICOS = ("int", "float")
+_DTYPES_STRING = ("object", "string")
+_MAX_UNIQUE_VALUES = 50
 
 
 def _es_numerico(dtype: str) -> bool:
     return any(t in dtype.lower() for t in _DTYPES_NUMERICOS)
+
+
+def _es_string(dtype: str) -> bool:
+    return any(t in dtype.lower() for t in _DTYPES_STRING)
 
 
 @router.post("/subir", response_model=UploadResponse)
@@ -30,10 +36,24 @@ async def subir_dataset(archivo: UploadFile = File(...)) -> UploadResponse:
 
     dataset_id, df = procesar_y_guardar_csv(contenido)
 
-    columns_info = [
-        ColumnInfo(name=str(col), dtype=str(dtype))
-        for col, dtype in df.dtypes.items()
-    ]
+    columns_info: list[ColumnInfo] = []
+    for col, dtype in df.dtypes.items():
+        dtype_str = str(dtype)
+        unique_values: list[str] | None = None
+        if _es_string(dtype_str):
+            try:
+                unicos = df[col].dropna().unique().tolist()
+                unicos_str = [str(v) for v in unicos[:_MAX_UNIQUE_VALUES]]
+                unique_values = unicos_str
+            except Exception:
+                unique_values = None
+        columns_info.append(
+            ColumnInfo(
+                name=str(col),
+                dtype=dtype_str,
+                unique_values=unique_values,
+            )
+        )
 
     return UploadResponse(
         dataset_id=dataset_id,

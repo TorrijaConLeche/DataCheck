@@ -39,11 +39,19 @@ export class HomePage {
   feedbackError = signal<string[] | null>(null);
   enviando = signal<boolean>(false);
 
+  seccionSubirAbierta = signal<boolean>(true);
+  seccionInfoAbierta = signal<boolean>(false);
+  seccionConfigAbierta = signal<boolean>(false);
+
   columnasDisponibles = computed(() => this.datasetInfo()?.columns_info ?? []);
   columnasRestriccion = computed(() =>
     this.columnasDisponibles().filter(c => c.name !== this.targetColumn())
   );
   columnasConRestriccion = computed(() => Array.from(this.restricciones().keys()));
+  targetDtype = computed(() => {
+    const target = this.targetColumn();
+    return this.columnasDisponibles().find(c => c.name === target)?.dtype ?? '';
+  });
 
   constructor(
     private uploadService: UploadService,
@@ -67,6 +75,9 @@ export class HomePage {
         this.targetColumn.set('');
         this.restricciones.set(new Map());
         this.columnaParaRestriccion.set('');
+        this.seccionSubirAbierta.set(false);
+        this.seccionInfoAbierta.set(true);
+        this.seccionConfigAbierta.set(true);
       },
       error: err => {
         const detail = err?.error?.detail ?? err?.error?.message ?? 'No se pudo subir el archivo';
@@ -89,6 +100,16 @@ export class HomePage {
 
   onColumnaRestriccionChange(value: string): void {
     this.columnaParaRestriccion.set(value);
+  }
+
+  toggleSeccion(seccion: 'subir' | 'info' | 'config'): void {
+    if (seccion === 'subir') {
+      this.seccionSubirAbierta.update(v => !v);
+    } else if (seccion === 'info') {
+      this.seccionInfoAbierta.update(v => !v);
+    } else {
+      this.seccionConfigAbierta.update(v => !v);
+    }
   }
 
   agregarRestriccion(): void {

@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  padding: var(--space-8) 0;
 }
 
 .info-grid {
@@ -15,20 +16,43 @@
   flex-direction: column;
   gap: var(--space-8);
   padding: var(--space-16);
-  background-color: var(--bright-snow);
-  border-radius: 4px;
+  background: linear-gradient(135deg, var(--bright-snow) 0%, var(--ocean-blue-50) 100%);
+  border: 1px solid var(--slate-grey-light);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.info-cell:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .info-value {
   font-size: var(--font-size-24);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--prussian-blue);
+  letter-spacing: -0.02em;
+}
+
+.info-value-sm {
+  font-size: var(--font-size-14);
+  font-weight: 500;
+  color: var(--prussian-blue);
+  word-break: break-all;
+}
+
+.target-selected {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: var(--font-size-14);
+  color: var(--prussian-blue);
+  margin-top: var(--space-8);
 }
 
 .divider {
   height: 1px;
-  background-color: var(--slate-grey);
-  opacity: 0.3;
+  background: linear-gradient(90deg, transparent 0%, var(--slate-grey-light) 50%, transparent 100%);
   margin: var(--space-8) 0;
 }
 
@@ -38,7 +62,7 @@
   gap: var(--space-16);
 }
 
-.constraint-add .field-label {
+.constraint-add-field {
   flex: 1;
 }
 
@@ -49,19 +73,31 @@
 }
 
 .constraint-card {
-  border: 1px solid var(--slate-grey);
-  border-radius: 4px;
+  border: 1px solid var(--slate-grey-light);
+  border-radius: var(--radius-md);
   padding: var(--space-16);
-  background-color: var(--bright-snow);
+  background: linear-gradient(180deg, var(--bright-snow) 0%, var(--white) 100%);
   display: flex;
   flex-direction: column;
   gap: var(--space-16);
+  transition: box-shadow var(--transition);
+}
+
+.constraint-card:hover {
+  box-shadow: var(--shadow-sm);
 }
 
 .constraint-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.constraint-header-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
 }
 
 .constraint-grid {
@@ -77,4 +113,5 @@
 .actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: var(--space-8);
 }

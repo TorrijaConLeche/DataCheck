@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 class ColumnInfo(BaseModel):
     name: str
     dtype: str
+    unique_values: list[str] | None = None
 
 
 class UploadResponse(BaseModel):
