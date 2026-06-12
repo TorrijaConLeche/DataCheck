@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "efa2cfecb36b587b",
+        "id": "129b8ecb2893a1a8",
         "type": "tabs",
         "children": [
           {
-            "id": "18fbf3deb352873d",
+            "id": "c753775ad6acc556",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -183,12 +183,12 @@
       "bases:Crear nueva base": false
     }
   },
-  "active": "18fbf3deb352873d",
+  "active": "c753775ad6acc556",
   "lastOpenFiles": [
-    "api_spec_v1.md",
-    "diseño-metricas.md",
-    "vision-general.md",
     "rules.md",
+    "vision-general.md",
+    "diseño-metricas.md",
+    "api_spec_v1.md",
     "Sin nombre"
   ]
 }

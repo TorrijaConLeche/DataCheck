@@ -15,16 +15,19 @@ El sistema tiene como objetivo principal permitir a un usuario subir un dataset 
 El flujo general del sistema es el siguiente:
 
 1. El usuario carga un fichero CSV a través de la interfaz.
-2. El backend procesa el fichero utilizando Python y Pandas.
-3. Se calculan diferentes métricas asociadas al dataset.
-4. Los resultados se devuelven al usuario de forma estructurada.
-5. El frontend muestra los resultados de manera visual y organizada.
-6. El sistema proporciona una interpretación textual de los resultados obtenidos.
-7. (No incluido en MVP) El usuario puede descargar un pdf informe de los resultados 
+2. El backend procesa el fichero, lo almacena y devuelve información de las columnas.
+3. El usuario configura la columna objetivo (target) y las restricciones de calidad (constraints) para las features.
+4. El backend valida y guarda la configuración.
+5. El usuario solicita el análisis.
+6. El backend ejecuta las métricas usando el contexto configurado.
+7. Los resultados se devuelven al usuario de forma estructurada.
+8. El frontend muestra los resultados de manera visual y organizada.
+9. El sistema proporciona una interpretación textual de los resultados obtenidos.
+10. (No incluido en MVP) El usuario puede descargar un pdf informe de los resultados.
 
 
 El dataset subido seguirá los siguientes estados previstos:
- status = "uploaded" | "valid" | "confirmed" | "processing" | "completed" | "error"
+ status = "uploaded" | "configured" | "processing" | "completed" | "error"
 
 En el estado actual del backend se dispone de un flujo inicial simplificado: subida/procesado de CSV y ejecución de métricas sobre un `DataFrame`.
 
@@ -114,3 +117,17 @@ No incluye:
 - Generacion de PDF informe con los resultados (en el MVP).
 - Creación de cuenta o historial de datasets.
 - Procesamiento de multiples datasets simultaneamente.
+
+
+## 8. Diseño Frontend / UX-UI 
+No habrá tests en el frontend, todos los -spec se eliminaran
+Todo menos la fuente se define como una variable CSS:
+- Fuente Montserrat en todo el proyecto
+- Tamaños letra: 32px, 24px, 18px, 14px
+- Espaciados: 8px, 16px, 24px
+- Colores:
+--ocean-blue: #0284c7ff; (color acento)
+--bright-snow: #f8fafcff;  (fondo principal)
+--white: #ffffffff;  (tarjetas / secciones)
+--prussian-blue: #0f172aff;  (texto principal)
+--slate-grey: #64748bff; (texto secundario / bordes)

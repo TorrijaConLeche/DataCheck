@@ -1,23 +1,10 @@
-import { Component} from '@angular/core';
-import { UploadService } from './services/upload-service';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
-  resultado: any;
-
-  constructor(private uploadService: UploadService) {}
-
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-
-    this.uploadService.subirCSV(file).subscribe(res => {
-      this.resultado = res;
-      console.log(res);
-    });
-  }
-}
+export class App {}

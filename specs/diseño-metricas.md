@@ -20,6 +20,8 @@ MetricResult
 MetricEngine
 MetricRegistry
 MetricSource
+FeatureConstraints
+DatasetRules
 ```
 
 ---
@@ -38,12 +40,53 @@ Cada métrica deberá definir:
     
 - `source`
     
-- `compute(df)`
+- `compute(df, context=None)`
     
 
-La función `compute(df)` recibirá un `DataFrame` y devolverá un `MetricResult`.
+La función `compute(df, context=None)` recibirá un `DataFrame` y un diccionario opcional con contexto adicional (target_column, constraints, umbrales, etc.) y devolverá un `MetricResult`.
 
-En el futuro, algunas métricas podrán necesitar contexto adicional, por ejemplo columna objetivo, umbrales o rangos válidos. En la fase actual se mantiene `compute(df)` para simplificar.
+El contexto permite que métricas como `Eft-ML-1` accedan a las restricciones definidas por el usuario, o que `Div-ML-1` y `Bal-ML-3` conozcan la columna objetivo sin tenerla hardcodeada.
+
+---
+
+## FeatureConstraints y DatasetRules
+
+Modelo que permite al usuario definir qué valores son válidos para cada feature del dataset y cuál es la columna objetivo.
+
+### FeatureConstraints
+
+Define las restricciones aplicables a una columna (feature):
+
+```python
+@dataclass
+class FeatureConstraints:
+    min: float | None = None
+    max: float | None = None
+    allowed_values: list[str | int | float] | None = None
+    regex: str | None = None
+    not_null: bool = False
+```
+
+- `min` / `max`: rango válido para columnas numéricas.
+- `allowed_values`: valores permitidos para columnas categóricas.
+- `regex`: patrón que debe cumplir el valor (columnas de texto).
+- `not_null`: si es `True`, no se permiten valores nulos.
+
+### DatasetRules
+
+Agrupa la configuración completa del usuario para un dataset:
+
+```python
+@dataclass
+class DatasetRules:
+    target_column: str
+    constraints: dict[str, FeatureConstraints]
+```
+
+- `target_column`: columna que contiene la etiqueta a predecir (target). Ejemplo: `Survived`.
+- `constraints`: mapeo de columna → restricciones. Solo aparecen aquí las features (predictores).
+
+Estos datos los envía el usuario mediante `POST /datasets/{id}/rules` y se almacenan en `storage/datasets/{dataset_id}-rules.json`.
 
 ---
 
@@ -117,11 +160,14 @@ model/
 ├── base_metric.py
 ├── metric_result.py
 ├── metric_source.py
+├── feature_constraints.py
 ├── registry.py
 └── metrics/
     ├── basic/
     └── iso/
-        └── diversity/
+        ├── diversity/
+        ├── balance/
+        └── effectiveness/
 ```
 
 Cada clase contendrá únicamente la lógica necesaria para calcular esa métrica.
@@ -135,7 +181,7 @@ Se usará el patrón **Strategy**.
 Cada métrica será una estrategia distinta de cálculo, pero todas compartirán la misma interfaz:
 
 ```python
-compute(df) -> MetricResult
+compute(df, context=None) -> MetricResult
 ```
 
 Esto permitirá añadir nuevas métricas sin modificar el motor principal del sistema.
@@ -164,6 +210,9 @@ Actualmente el registro incluye:
 - `Div-ML-1`
 - `Div-ML-2`
 - `Div-ML-3`
+- `Bal-ML-3`
+- `Bal-ML-8`
+- `Eft-ML-1`
 
 ---
 
@@ -175,13 +224,15 @@ Responsabilidades:
 
 1. Recibir un `DataFrame`.
     
-2. Obtener las métricas registradas.
+2. Recibir un `context` opcional con la configuración del usuario (target_column, constraints).
     
-3. Ejecutar cada métrica.
+3. Obtener las métricas registradas.
     
-4. Recoger los resultados.
+4. Ejecutar cada métrica pasando el `context`.
     
-5. Devolver una lista de `MetricResult`.
+5. Recoger los resultados.
+    
+6. Devolver una lista de `MetricResult`.
     
 
 ---
@@ -199,13 +250,13 @@ Esto permite que un fallo en una métrica concreta no detenga el análisis compl
 ## Flujo de análisis
 
 ```text
-CSV cargado
+CSV cargado + rules.json
     ↓
-DataFrame de Pandas
+DataFrame de Pandas + context (target_column, constraints)
     ↓
 MetricEngine
     ↓
-Métricas registradas
+Métricas registradas (reciben context)
     ↓
 Lista de MetricResult
     ↓
@@ -223,7 +274,14 @@ Cada métrica será independiente, reutilizable y fácil de probar.
 
 El sistema deberá permitir añadir nuevas métricas ISO, de papers o básicas sin modificar la lógica principal del análisis.
 
-## Ejemplo de metricas ISO de diversidad implementadas
+
+
+# Metricas ISO
+
+## Auditabilidad
+Implementación pendiente, necesita que el dataset a analizar contenga las columnas "auditado" y "auditable" (True o False) para poder calcular estas métricas.
+
+## Diversidad
 
 Las métricas de diversidad se implementan como una clase por cada identificador ISO:
 
@@ -240,13 +298,34 @@ Para la característica de balance, de momento se usarán estas métricas:
 
 No se implementan todavía las demás métricas de balance porque están orientadas a imagen y metadatos visuales (`brightness`, `resolution`, `bounding boxes`) o necesitan una definición de contexto más concreta para el CSV tabular.
 
+## Efectividad
+
+- `Eft-ML-1`: Feature Effectiveness.
+  Proporción de muestras que cumplen con las restricciones definidas por el usuario para las features.
+
+  ```
+  Eft-ML-1 = A / B
+  ```
+
+  - A: número de muestras que cumplen TODAS las constraints definidas.
+  - B: número total de muestras en el dataset.
+
+  Evaluación: para cada fila, se verifica que cada feature con restricciones cumpla su condición (rango numérico, valor permitido, regex, no nulo). Si alguna falla, la fila no cuenta como válida.
+
+  Interpretación: valor entre 0 y 1. Cercano a 1 indica que la mayoría de muestras tienen características aceptables para las features.
+
 ## Input del usuario
 
 Algunas métricas ISO no pueden calcularse únicamente a partir del CSV, ya que necesitan información de contexto indicada por el usuario.
 
-En la fase actual se contemplan los siguientes parámetros:
+Actualmente el usuario configura los siguientes parámetros desde la interfaz, que se envían mediante `POST /datasets/{id}/rules`:
 
-- `TARGET_COLUMN`: columna objetivo del dataset. Normalmente representa la variable que se quiere predecir en un modelo de clasificación. Ejemplo: `Survived` en Titanic.
-- `DIV_THRESHOLD`: umbral mínimo de cardinalidad para considerar que una clase tiene suficientes ejemplos en la métrica `Div-ML-3`.
+- `target_column`: columna objetivo del dataset. Representa la variable que se quiere predecir (target). Ejemplo: `Survived` en Titanic.
+- `constraints`: restricciones de calidad por feature. Cada feature puede tener cero o más restricciones (`min`, `max`, `allowed_values`, `regex`, `not_null`).
 
-Inicialmente estos valores pueden estar definidos de forma fija en el backend. En una fase posterior serán seleccionados por el usuario desde la interfaz.
+Estos valores se persisten en `storage/datasets/{dataset_id}-rules.json` y se pasan como `context` a cada métrica durante el análisis.
+
+Además, ciertas métricas pueden necesitar umbrales adicionales:
+- `DIV_THRESHOLD`: umbral mínimo de cardinalidad para considerar que una clase tiene suficientes ejemplos en la métrica `Div-ML-3`. Por ahora se mantiene fijo en el backend.
+
+
